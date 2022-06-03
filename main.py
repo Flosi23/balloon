@@ -9,7 +9,7 @@ fileHandler = open("data.csv", "a")
 
 READING_INTERVAL = 2.0
 
-htSensor = adafruit_dht.DHT22(board.D18)
+htSensor = adafruit_dht.DHT22(board.GPIO4)
 uvSensor = SI1145.SI1145()
 
 headings = ["Time", "Temperature", "Humidity", "UV", "IR", "Visible"]
