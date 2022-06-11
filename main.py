@@ -1,36 +1,26 @@
 #!usr/bin/python
-
 import datetime
 import random
 from time import sleep
 import SI1145.SI1145 as SI1145
-import pigpio
-import DHT
-
+import board
+import adafruit_lps2x
 
 fileHandler = open("data.csv", "a")
 
 READING_INTERVAL = 2.0
 RETRIES = 10
 
-pi = pigpio.pi()
-
-if not pi.connected:
-    print("Pi not connected")
-    exit()
-
-dhtSensor = DHT.sensor(pi, 12, DHT.DHT11)
-
 uvSensor = SI1145.SI1145()
+pressureSensor = adafruit_lps2x.LPS22(board.I2C())
 
-
-dhtSensorRetries = RETRIES
+pressureSensorRetries = RETRIES
 uvSensorRetries = RETRIES
 
-dhtSensorError = False
+pressureSensorError = False
 uvSensorError = False
 
-headings = ["Time", "Temperature", "Humidity", "UV", "IR", "Visible"]
+headings = ["Time", "Temperature", "Air Pressure", "UV", "IR", "Visible"]
 
 def writeRow(values):
     if(len(values) != len(headings)):
@@ -53,28 +43,25 @@ def sampleRow():
     ir = random.uniform(0, 100)
     visible = random.uniform(0, 20)
     return [time, temperature, humidity, uv, ir, visible]
-
-def readHumidityAndTemperature():
-    global dhtSensorError
-    global dhtSensorRetries
-
-    if(dhtSensorError and dhtSensorRetries == 0):
-        print("All 10 dhtSensor retries failed")
-        return [0,0]
-
-    timestamp, gpio, status, temperature, humidity = dhtSensor.read() 
-
-    if(status == DHT.DHT_GOOD):
-        return [temperature, humidity]
-
-    if(status == DHT.DHT_TIMEOUT):
-        print("DHT Sensor timed out")
-        dhtSensorError = True
-        dhtSensorRetries -= 1
-        return [0,0]
-
-    return [0,0]
     
+def readTempPressure():
+    global pressureSensorError
+    global pressureSensorRetries
+
+    if(pressureSensorError and pressureSensorRetries == 0):
+        print("All 10 pressureSensor retries failed")
+        return ["err","err"]
+    
+    try:
+        pressure = pressureSensor.pressure
+        temp = pressureSensor.temperature
+
+        return [temp, pressure]
+    except Exception:
+        pressureSensorError = True
+        pressureSensorRetries -= 1
+        return ["err", "err"]
+
 
 def readIRVisibleUV():
     global uvSensorError
@@ -82,7 +69,7 @@ def readIRVisibleUV():
     
     if(uvSensorError and uvSensorRetries == 0):
         print("All 10 uvSensor retries failed")
-        return [0,0,0]
+        return ["err","err","err"]
 
     try:
         vis = uvSensor.readVisible()
@@ -90,24 +77,22 @@ def readIRVisibleUV():
         ir = uvSensor.readIR()
 
         return [uv, ir, vis]
-    except Exception as error:
+    except Exception:
         uvSensorError = True
         uvSensorRetries -= 1
-        return [0,0,0]
+        return ["err","err","err"]
     
 def writeSample():
-    for i in range(0, 100):
+    for _ in range(0, 100):
         writeRow(sampleRow())
 
 def writeSensorData():
     while True:
-        tempAndHum = readHumidityAndTemperature()
+        tempPressure = readTempPressure()
         uvIRVisible = readIRVisibleUV()
         time = [datetime.datetime.now()]
-        writeRow(time + tempAndHum + uvIRVisible)
+        writeRow(time + tempPressure + uvIRVisible)
         sleep(READING_INTERVAL)
-
-readHumidityAndTemperature()
 
 fileHandler.close();
 
