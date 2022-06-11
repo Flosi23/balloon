@@ -61,8 +61,7 @@ def readTempPressure():
         pressureSensorError = True
         pressureSensorRetries -= 1
         return ["err", "err"]
-
-
+        
 def readIRVisibleUV():
     global uvSensorError
     global uvSensorRetries
