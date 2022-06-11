@@ -3,22 +3,15 @@ import datetime
 import random
 from time import sleep
 import SI1145.SI1145 as SI1145
-import board
+from adafruit_extended_bus import ExtendedI2C as I2C
 import adafruit_lps2x
 
 fileHandler = open("data.csv", "a")
 
 READING_INTERVAL = 2.0
-RETRIES = 10
 
 uvSensor = SI1145.SI1145()
-pressureSensor = adafruit_lps2x.LPS22(board.I2C())
-
-pressureSensorRetries = RETRIES
-uvSensorRetries = RETRIES
-
-pressureSensorError = False
-uvSensorError = False
+pressureSensor = adafruit_lps2x.LPS22(I2C(3))
 
 headings = ["Time", "Temperature", "Air Pressure", "UV", "IR", "Visible"]
 
@@ -45,31 +38,15 @@ def sampleRow():
     return [time, temperature, humidity, uv, ir, visible]
     
 def readTempPressure():
-    global pressureSensorError
-    global pressureSensorRetries
-
-    if(pressureSensorError and pressureSensorRetries == 0):
-        print("All 10 pressureSensor retries failed")
-        return ["err","err"]
-    
     try:
         pressure = pressureSensor.pressure
         temp = pressureSensor.temperature
 
         return [temp, pressure]
     except Exception:
-        pressureSensorError = True
-        pressureSensorRetries -= 1
         return ["err", "err"]
         
 def readIRVisibleUV():
-    global uvSensorError
-    global uvSensorRetries
-    
-    if(uvSensorError and uvSensorRetries == 0):
-        print("All 10 uvSensor retries failed")
-        return ["err","err","err"]
-
     try:
         vis = uvSensor.readVisible()
         uv = uvSensor.readUV()
@@ -77,8 +54,6 @@ def readIRVisibleUV():
 
         return [uv, ir, vis]
     except Exception:
-        uvSensorError = True
-        uvSensorRetries -= 1
         return ["err","err","err"]
     
 def writeSample():
@@ -90,8 +65,12 @@ def writeSensorData():
         tempPressure = readTempPressure()
         uvIRVisible = readIRVisibleUV()
         time = [datetime.datetime.now()]
+        row = time + tempPressure + uvIRVisible
+        print(row)
         writeRow(time + tempPressure + uvIRVisible)
         sleep(READING_INTERVAL)
+
+writeSensorData();
 
 fileHandler.close();
 
