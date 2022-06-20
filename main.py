@@ -31,11 +31,11 @@ def writeRow(values):
 def sampleRow():
     time = datetime.datetime.now()
     temperature = random.uniform(-50, 20)
-    humidity = random.uniform(10, 50)
+    airPressure = random.uniform(1050, 100)
     uv = random.uniform(0, 13)
     ir = random.uniform(0, 100)
     visible = random.uniform(0, 20)
-    return [time, temperature, humidity, uv, ir, visible]
+    return [time, temperature, airPressure, uv, ir, visible]
     
 def readTempPressure():
     try:
@@ -70,7 +70,7 @@ def writeSensorData():
         writeRow(time + tempPressure + uvIRVisible)
         sleep(READING_INTERVAL)
 
-writeSensorData();
+writeSample()
 
 fileHandler.close();
 
