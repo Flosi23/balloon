@@ -10,8 +10,11 @@ fileHandler = open("data.csv", "a")
 
 READING_INTERVAL = 2.0
 
-uvSensor = SI1145.SI1145()
-pressureSensor = adafruit_lps2x.LPS22(I2C(3))
+TESTING = False;
+
+if not TESTING:
+    uvSensor = SI1145.SI1145()
+    pressureSensor = adafruit_lps2x.LPS22(I2C(3))
 
 headings = ["Time", "Temperature", "Air Pressure", "UV", "IR", "Visible"]
 
@@ -57,8 +60,9 @@ def readIRVisibleUV():
         return ["err","err","err"]
     
 def writeSample():
-    for _ in range(0, 100):
+    while True:
         writeRow(sampleRow())
+        sleep(READING_INTERVAL)
 
 def writeSensorData():
     while True:
@@ -70,8 +74,9 @@ def writeSensorData():
         writeRow(time + tempPressure + uvIRVisible)
         sleep(READING_INTERVAL)
 
-writeSample()
+if TESTING:
+    writeSample()
+else: 
+    writeSensorData()
 
 fileHandler.close();
-
-
