@@ -3,13 +3,24 @@
  	import Dashboard from "./dashboard/Dashboard.svelte";
 	export let name;
 
- 	let picked = true;
+ 	let picked = false;
+
+    let logs;
+ function setLogs(l) {
+     //console.log(l.detail);
+     logs = l.detail;
+    picked = true;
+ }
+
+ function setType(t) {
+
+ }
 </script>
 
 <main>
 	{#if !picked}
-		<FilePicker />
+		<FilePicker on:setType={setType} on:setlogs={setLogs} />
 	{:else}
-		<Dashboard />
+		<Dashboard logs={logs} />
 	{/if}
 </main>
