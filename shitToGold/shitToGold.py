@@ -14,6 +14,18 @@ def formatLine(line):
 
     return ",".join(fields) 
 
+def cleanUpLines(){
+    lastLineSeconds = -1
+    i = 0
+    while i < len(lines):
+        thisLineSeconds = int(lines[i].split(',')[0])
+        if thisLineSeconds == lastLineSeconds:
+            del lines[i-1]
+        else:
+            i += 1
+        lastLineSeconds = thisLineSeconds
+}
+
 for i in range(0,99):
     try:
         filename = "DATA_"+f'{i:02d}'+".TXT"
@@ -28,7 +40,9 @@ for i in range(0,99):
     except e: 
         print("Unable to open file", e)
 
-lines = sorted(lines, key=lambda x: x[0])
+lines = sorted(lines, key=lambda line: line.split(',')[0])
+
+cleanUpLines()
 
 f = open("./data.csv", "w")
 f.write("\n".join(lines))
