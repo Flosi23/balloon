@@ -1,11 +1,33 @@
 import sys
 import datetime
 
-#srcDir = sys.argv[1]
-
-srcDir ="/Users/simon/Documents/P-Seminar/Daten Misson vom 28.03.2017 DLR/Data Mission 28 03 2017/" 
+# Specifying the srcDir like this means that this script expects to be executed from ./balloon/shitToGold!
+srcDir ="./rawdata/" 
 
 lines = []
+
+def createUnixTimestamp(month, day, hour, minute, second):
+    timestamp = 0
+    # Only create a unix timestamp if the given parameters are valid
+    if (
+        (month >= 1 and month <= 12) and 
+        (day >= 1 and day <= 31) and 
+        (hour >= 0 and hour < 24) and 
+        (minute >= 0 and minute < 60) and
+        (second >= 0 and second < 60)
+    ):
+        timestamp = datetime.datetime(2022, month, day, hour, minute,second).timestamp()
+
+    return timestamp
+
+def parseRawDateAndTimeToUnixTimestamp(md,hms):
+    month = int(md[0])
+    day = int(md[1])
+    hour = int(hms[0])
+    minute = int(hms[1]) 
+    second = int(hms[2])
+    return createUnixTimestamp(month, day, hour, minute, second)
+
 
 def formatLine(line):
     fields = line.replace("\n","").split(',')
@@ -13,14 +35,7 @@ def formatLine(line):
     for i in range(0, len(fields)):
         fields[i] = fields[i].split(' ')[1]
 
-    hms = list(map(lambda x: int(x), fields[6].split(":")))
-    dm  = list(map(lambda x: int(x), fields[7].split("/")))
-    
-    timestamp = 0
-    # If month or day are invalid values set 0 as unix timestamp
-    if dm[0] > 0 or dm[0] <= 31 or dm[1] > 0 or dm[1] <= 12:
-        time = datetime.datetime(2022, dm[0], dm[1], hms[0], hms[1],hms[2])
-        timestamp = datetime.datetime.timeStamp(time) * 1000
+    timestamp = parseRawDateAndTimeToUnixTimestamp(fields[6], fields[7])
 
     fields[6] = timestamp
     del fields[7]
