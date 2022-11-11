@@ -1,4 +1,5 @@
 import sys
+import datetime
 
 #srcDir = sys.argv[1]
 
@@ -12,9 +13,21 @@ def formatLine(line):
     for i in range(0, len(fields)):
         fields[i] = fields[i].split(' ')[1]
 
-    return ",".join(fields) 
+    hms = list(map(lambda x: int(x), fields[6].split(":")))
+    dm  = list(map(lambda x: int(x), fields[7].split("/")))
+    
+    timestamp = 0
+    # If month or day are invalid values set 0 as unix timestamp
+    if dm[0] > 0 or dm[0] <= 31 or dm[1] > 0 or dm[1] <= 12:
+        time = datetime.datetime(2022, dm[0], dm[1], hms[0], hms[1],hms[2])
+        timestamp = datetime.datetime.timeStamp(time) * 1000
 
-def cleanUpLines(){
+    fields[6] = timestamp
+    del fields[7]
+
+    return ",".join(fields)
+
+def cleanUpLines():
     lastLineSeconds = -1
     i = 0
     while i < len(lines):
@@ -24,7 +37,7 @@ def cleanUpLines(){
         else:
             i += 1
         lastLineSeconds = thisLineSeconds
-}
+
 
 for i in range(0,99):
     try:
