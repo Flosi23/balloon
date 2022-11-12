@@ -46,29 +46,47 @@
 
 const dispatch = createEventDispatcher();
 
-export let sensor = 9;
+export let sensor = 0;
 
  $: sensor & dispatch('change', sensor);
 </script>
 
 <div style="background: #1E1F26; border-radius: .75rem;">
-    <p>Stratoflights Datenlogger</p>
-    <input checked id="height" type="radio" bind:group={sensor} name="sensor" value="9" />
-    <label for="height">Flughöhe</label>
-    <input id="velocity" type="radio" bind:group={sensor} name="sensor" value="7" />
-    <label for="velocity">Geschwindigkeit</label>
-    <input id="temp" type="radio" bind:group={sensor} name="sensor" value="10" />
-    <label for="temp">Temperatur</label>
-
     <p style="margin-top: 30px;">S & J Datenlogger</p>
-    <input id="uv" type="radio" bind:group={sensor} name="sensor" value="2" />
-    <label for="uv">UV-Intensität</label>
-    <input id="actualTemp" type="radio" bind:group={sensor} name="sensor" value="0" />
-    <label for="actualTemp">Temperatur (außen)</label>
+
+    <input checked id="running-second" type="radio" bind:group={sensor} name="sensor" value="0" />
+    <label for="running-second">Laufende Sekunde</label>
+
     <input id="pressure" type="radio" bind:group={sensor} name="sensor" value="1" />
-    <label for="pressure">Luftdruck</label>
-    <input id="ir" type="radio" bind:group={sensor} name="sensor" value="3" />
-    <label for="ir">Infrarot</label>
-    <input id="visible" type="radio" bind:group={sensor} name="sensor" value="4" />
-    <label for="visible">Sichtbares Licht</label>
+    <label for="pressure">Druck</label>
+
+    <input id="humidity-inside" type="radio" bind:group={sensor} name="sensor" value="2" />
+    <label for="humidity-inside">Luftfeuchtigkeit (innen)</label>
+
+    <input id="temp-inside" type="radio" bind:group={sensor} name="sensor" value="3" />
+    <label for="temp-inside">Temperatur (innen)</label>
+
+    <input id="humidity-outside" type="radio" bind:group={sensor} name="sensor" value="4" />
+    <label for="humidity-outside">Luftfeuchtigkeit (außen)</label>
+
+    <input id="temp-outside" type="radio" bind:group={sensor} name="sensor" value="5" />
+    <label for="temp-outside">Temperatur (außen)</label>
+
+    <input id="unix-time" type="radio" bind:group={sensor} name="sensor" value="6" />
+    <label for="unix-time">Unix-Timestamp</label>
+
+    <input id="gps-fix" type="radio" bind:group={sensor} name="sensor" value="7" />
+    <label for="gps-fix">GPS-Fix</label>
+
+    <input id="gps-sat" type="radio" bind:group={sensor} name="sensor" value="8" />
+    <label for="gps-sat">GPS-Satelliten</label>
+
+    <input id="gps-length" type="radio" bind:group={sensor} name="sensor" value="9" />
+    <label for="gps-length">GPS-Länge</label>
+
+    <input id="gps-width" type="radio" bind:group={sensor} name="sensor" value="10" />
+    <label for="gps-width">GPS-Breite</label>
+
+    <input id="gps-height" type="radio" bind:group={sensor} name="sensor" value="11" />
+    <label for="gps-height">GPS-Höhe</label>
 </div>

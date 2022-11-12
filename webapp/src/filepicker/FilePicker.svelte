@@ -32,16 +32,10 @@ function pickFile() {
 
 
     fr.onload = (e) => {
-        //console.log(fr.result);
-
-        let typ = this.files[0].name.split(".")[1] == "csv" ? 1 : 0; // 0 strato, 1 own
-
         let rows = fr.result.split(/\r\n|\n/);
-        for (let i = (typ == 0 ? 2 : 0); i < rows.length - 1; i++) {
-            //console.log(rows[i].split(";"));
-            data.push(rows[i].split(typ == 0 ? ";" : ","));
+        for (let i = 0; i < rows.length - 1; i++) {
+            data.push(rows[i].split(","));
         }
-
 
         dispatch('setlogs', data);
     }
