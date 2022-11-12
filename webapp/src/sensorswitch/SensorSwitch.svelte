@@ -54,9 +54,6 @@ export let sensor = 0;
 <div style="background: #1E1F26; border-radius: .75rem;">
     <p style="margin-top: 30px;">S & J Datenlogger</p>
 
-    <input checked id="running-second" type="radio" bind:group={sensor} name="sensor" value="0" />
-    <label for="running-second">Laufende Sekunde</label>
-
     <input id="pressure" type="radio" bind:group={sensor} name="sensor" value="1" />
     <label for="pressure">Druck</label>
 
@@ -71,21 +68,6 @@ export let sensor = 0;
 
     <input id="temp-outside" type="radio" bind:group={sensor} name="sensor" value="5" />
     <label for="temp-outside">Temperatur (außen)</label>
-
-    <input id="unix-time" type="radio" bind:group={sensor} name="sensor" value="6" />
-    <label for="unix-time">Unix-Timestamp</label>
-
-    <input id="gps-fix" type="radio" bind:group={sensor} name="sensor" value="7" />
-    <label for="gps-fix">GPS-Fix</label>
-
-    <input id="gps-sat" type="radio" bind:group={sensor} name="sensor" value="8" />
-    <label for="gps-sat">GPS-Satelliten</label>
-
-    <input id="gps-length" type="radio" bind:group={sensor} name="sensor" value="9" />
-    <label for="gps-length">GPS-Länge</label>
-
-    <input id="gps-width" type="radio" bind:group={sensor} name="sensor" value="10" />
-    <label for="gps-width">GPS-Breite</label>
 
     <input id="gps-height" type="radio" bind:group={sensor} name="sensor" value="11" />
     <label for="gps-height">GPS-Höhe</label>

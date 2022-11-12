@@ -6,7 +6,21 @@ import SensorSwitch from '../sensorswitch/SensorSwitch.svelte';
 
 export let logs = [];
 
-let sensorUnit = ["°C", "hPA", "Lux", "Lux", "Lux", "", "", "", "", "", "", "", "", "", ""]
+let sensorUnit = ["s", "hPA", "%", "°C", "%", "°C", "", "", "", "", "m"]
+let sensorName = [
+    "Laufende Sekunde", 
+    "Druck",
+    "Luftfeuchtigkeit (innen)",
+    "Temperatur (innen)", 
+    "Luftfeutichgkeit (außen)",
+    "Temperatur (außen)",
+    "Unix Timestamp",
+    "GPS-Fix",
+    "GPS-Satelliten",
+    "GPS-Länge",
+    "GPS-Breite",
+    "Höhe"
+]
 
 $: {
     if (myChart) {}
@@ -21,7 +35,15 @@ let option; // echarts options
 let sensor = 9; // selected sensor data
 
 let times = [];
+let heights = [];
 let fLogs = []; 
+
+function formatDate(date){
+    console.log(date)
+    const hour = date.getHours()
+    const minutes = date.getMinutes()
+    return `${hour}:${minutes}`
+}
 
 function generateChartData() {
     /*
@@ -41,7 +63,8 @@ function generateChartData() {
     If a value was not recorded, the fields value will instead be "--.---"
     */
 
-    times = logs.map(row => row[6])
+    times = logs.map(row => formatDate(new Date(row[6] * 1000)))
+    heights = logs.map(row => row[11])
     fLogs = [] // filtered logs
     
     logs.forEach(row => fLogs.push(row))
@@ -52,39 +75,56 @@ function generateChartData() {
 function changeSensor() {
     if (option && myChart) {
         option.xAxis.data = times;
-        option.yAxis.name = sensorUnit[sensor];
+        option.yAxis[1].name = sensorUnit[sensor];
 
         let data = [];
         for (let row of fLogs){
             data.push(row[sensor]);
         }
-        //console.log("data", data);
-        option.series[0].data = data;
+
+        option.series[1].data = data;
+        option.series[1].name = sensorName[sensor]
+
+        option.series[0].data = heights;
+
         myChart.setOption(option);
     }
 }
-
 
 onMount(() => {
     myChart = echarts.init(chart);
 
     option = {
-    xAxis: {
-        type: 'category',
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-        type: 'value'
-    },
-    tooltip: {
-        trigger: 'axis'
-    },
-    series: [
-        {
-        data: [150, 230, 224, 218, 135, 147, 260],
-        type: 'line'
-        }
-    ]
+        xAxis: {
+            type: 'category',
+        },
+        yAxis: [
+            {
+                type: 'value',
+                name: 'm',
+                alignTicks: true,
+            },
+            {
+                type: 'value',
+                alignTicks: true,
+            }
+        ],
+        tooltip: {
+            trigger: 'axis'
+        },
+        series: [
+            {
+                name: "Höhe",
+                yAxisIndex: 0,
+                type: 'line',
+                showSymbol: false,
+            },
+            {
+                yAxisIndex: 1,
+                type: 'line',
+                showSymbol: false,
+            }
+        ], 
     };
 
     option && myChart.setOption(option);
@@ -130,12 +170,16 @@ function resizeGraph() {
         flex-wrap: nowrap;
         max-width: 100vw;
     }
+
+    input {
+        background-color: inherit;
+        color: white;
+    }
 </style>
 
 <div class="wrapper">
     <nav>
         <h1 style="color: #eaeaea;font-size: 1.8rem;">Die 🎈 Louise</h1>
-        <p>Flug: 17.06.22 11:00 - 15:00</p>
     </nav>
 
     <div class="content">

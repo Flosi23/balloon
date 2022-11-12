@@ -18,7 +18,6 @@ lines = []
 #   9  GPS-Length,
 #   10 GPS-Width,
 #   11 GPS-Height
-# If a value was not recorded, the fields value will instead be "--.---"
 
 def createUnixTimestamp(month, day, hour, minute, second):
     timestamp = 0
@@ -76,6 +75,46 @@ def cleanUpLines():
             i += 1
         lastLineSeconds = thisLineSeconds
 
+# delete all lines that are not in between 9:00 and 11:30 (the timespan the flight took place)
+def extractFlightLines():
+    newLines = []
+    global lines
+
+    for line in lines:
+        timestamp = float(line.split(',')[6])
+        time = datetime.datetime.fromtimestamp(timestamp)
+        hour = time.hour
+        if hour >= 9 and hour < 12:
+            newLines.append(line)
+
+    lines = newLines
+
+# If the change of the current to the previous temp / humdidity value is bigger than 1000 it must be an error
+# It will be replaced by the previous value
+def flattenTempAndHumidityOutsideCurves():
+    fields = lines[0].split(',')
+    lastHumOut = float(fields[4])
+    lastTempOut = float(fields[5])
+
+    for i in range(0,len(lines)):
+        fields = lines[i].split(',')
+
+        if(fields[4] == "--.---" or fields[5] == "--.---"):
+            continue
+
+        currentHumOut = float(fields[4])
+        currentTempOut = float(fields[5])
+
+        if abs(currentHumOut - lastHumOut) > 1000:
+            fields[4] = str(lastHumOut)
+        else: lastHumOut = currentHumOut
+
+        if abs(currentTempOut - lastTempOut) > 1000:
+            fields[5] = str(lastTempOut)
+        else: lastTempOut = currentTempOut
+
+        lines[i] = ','.join(fields)
+
 
 # loop through all 100 files, format each line and collect all lines in one array
 for i in range(0,99):
@@ -88,10 +127,12 @@ for i in range(0,99):
         lines.append(formattedLine)
 
 
-# Sort the lines by running seconds (lines[0])
-lines = sorted(lines, key=lambda line: line.split(',')[0])
+# Sort the lines by unix timestamp (lines[0])
+lines = sorted(lines, key=lambda line: int(line.split(',')[0]))
 
 cleanUpLines()
+extractFlightLines()
+flattenTempAndHumidityOutsideCurves()
 
 f = open("./data.csv", "w")
 f.write("\n".join(lines))
