@@ -1,10 +1,23 @@
-import sys
 import datetime
 
 # Specifying the srcDir like this means that this script expects to be executed from ./balloon/shitToGold!
 srcDir ="./rawdata/" 
 
 lines = []
+
+# The generated CSV has the form: 
+#   0  Running second,
+#   1  Pressure,
+#   2  Humidity inside,
+#   3  Temperature inside,
+#   4  Humidity outside,
+#   5  Temperature outside,
+#   6  Unix timestamp,
+#   7  GPS-Fix,
+#   8  GPS-Satellites,
+#   9  GPS-Length,
+#   10 GPS-Width,
+#   11 GPS-Height
 
 def createUnixTimestamp(month, day, hour, minute, second):
     timestamp = 0
