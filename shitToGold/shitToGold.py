@@ -18,6 +18,7 @@ lines = []
 #   9  GPS-Length,
 #   10 GPS-Width,
 #   11 GPS-Height
+# If a value was not recorded, the fields value will instead be "--.---"
 
 def createUnixTimestamp(month, day, hour, minute, second):
     timestamp = 0
