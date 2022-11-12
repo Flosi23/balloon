@@ -20,9 +20,11 @@ def createUnixTimestamp(month, day, hour, minute, second):
 
     return timestamp
 
-def parseRawDateAndTimeToUnixTimestamp(md,hms):
-    month = int(md[0])
-    day = int(md[1])
+def parseRawDateAndTimeToUnixTimestamp(hms, md):
+    # md has the form [DAY,MONTH]
+    month = int(md[1])
+    day = int(md[0])
+    # hms has the form [HOUR,MINUTE,SECOND]
     hour = int(hms[0])
     minute = int(hms[1]) 
     second = int(hms[2])
@@ -30,21 +32,28 @@ def parseRawDateAndTimeToUnixTimestamp(md,hms):
 
 
 def formatLine(line):
+    # split the line in its columns
     fields = line.replace("\n","").split(',')
 
+    # raw lines have the form: UNIT VALUE
+    # we remove the unit, because we only want the value
     for i in range(0, len(fields)):
         fields[i] = fields[i].split(' ')[1]
 
-    timestamp = parseRawDateAndTimeToUnixTimestamp(fields[6], fields[7])
-
-    fields[6] = timestamp
+    # take the two columns month/date and hour:minute:seconds and combine them into one unix timestamp column
+    timestamp = parseRawDateAndTimeToUnixTimestamp(fields[6].split(":"), fields[7].split("/"))
+    fields[6] = str(timestamp)
     del fields[7]
 
+    # reassemble the fields into one line
     return ",".join(fields)
 
+# cleanUpLines() loops through all lines and removes running seconds duplicates
 def cleanUpLines():
     lastLineSeconds = -1
     i = 0
+    # We do expect the lines to be sorted, thus duplicates have to appear after each other
+    # Save running seconds of last line and compare them with current. If equal remove last line
     while i < len(lines):
         thisLineSeconds = int(lines[i].split(',')[0])
         if thisLineSeconds == lastLineSeconds:
@@ -54,20 +63,18 @@ def cleanUpLines():
         lastLineSeconds = thisLineSeconds
 
 
+# loop through all 100 files, format each line and collect all lines in one array
 for i in range(0,99):
-    try:
-        filename = "DATA_"+f'{i:02d}'+".TXT"
-        f = open(srcDir + filename,"r")
-        flines = f.readlines()
+    filename = "DATA_"+f'{i:02d}'+".TXT"
+    f = open(srcDir + filename,"r")
+    flines = f.readlines()
 
-        for i in range(0, len(flines)):
-            formattedLine = formatLine(flines[i])
-            lines.append(formattedLine)
+    for i in range(0, len(flines)):
+        formattedLine = formatLine(flines[i])
+        lines.append(formattedLine)
 
-        f.close()
-    except e: 
-        print("Unable to open file", e)
 
+# Sort the lines by running seconds (lines[0])
 lines = sorted(lines, key=lambda line: line.split(',')[0])
 
 cleanUpLines()
