@@ -25,21 +25,22 @@ let sensorName = [
 $: {
     if (myChart) {}
     if (logs) {
-    generateChartData();
+        generateChartData();
     }
 }
 
 let chart; // dom element
 let myChart; // echarts object
 let option; // echarts options
-let sensor = 9; // selected sensor data
+
+let sensorOne = 1; // selected sensor data
+let sensorTwo = 0;
 
 let times = [];
-let heights = [];
-let fLogs = []; 
+
+let currentTab = 0;
 
 function formatDate(date){
-    console.log(date)
     const hour = date.getHours()
     const minutes = date.getMinutes()
     return `${hour}:${minutes}`
@@ -62,30 +63,31 @@ function generateChartData() {
         11 GPS-Height
     If a value was not recorded, the fields value will instead be "--.---"
     */
-
     times = logs.map(row => formatDate(new Date(row[6] * 1000)))
-    heights = logs.map(row => row[11])
-    fLogs = [] // filtered logs
-    
-    logs.forEach(row => fLogs.push(row))
-    
-    changeSensor();
+
+    changeSensorOne()
 }
 
-function changeSensor() {
+function changeSensorOne(){
+    changeSensor(0,sensorOne)
+}
+
+function changeSensorTwo(){ 
+    changeSensor(1,sensorTwo)
+}
+
+function changeSensor(yAxisIndex, sensor) {
     if (option && myChart) {
         option.xAxis.data = times;
-        option.yAxis[1].name = sensorUnit[sensor];
+        option.yAxis[yAxisIndex].name = sensorUnit[sensor];
 
         let data = [];
-        for (let row of fLogs){
+        for (let row of logs){
             data.push(row[sensor]);
         }
 
-        option.series[1].data = data;
-        option.series[1].name = sensorName[sensor]
-
-        option.series[0].data = heights;
+        option.series[yAxisIndex].data = data;
+        option.series[yAxisIndex].name = sensorName[sensor]
 
         myChart.setOption(option);
     }
@@ -101,7 +103,6 @@ onMount(() => {
         yAxis: [
             {
                 type: 'value',
-                name: 'm',
                 alignTicks: true,
             },
             {
@@ -114,15 +115,20 @@ onMount(() => {
         },
         series: [
             {
-                name: "Höhe",
                 yAxisIndex: 0,
                 type: 'line',
                 showSymbol: false,
+                lineStyle: {
+                    color: sensorOneColor
+                }
             },
             {
                 yAxisIndex: 1,
                 type: 'line',
                 showSymbol: false,
+                lineStyle: {
+                    color: sensorTwoColor
+                }
             }
         ], 
     };
@@ -135,6 +141,9 @@ function resizeGraph() {
     if (myChart)
         myChart.resize();
 }
+
+const sensorOneColor = "#6755BE"
+const sensorTwoColor = "#a3be8c"
 </script>
 
 
@@ -171,10 +180,50 @@ function resizeGraph() {
         max-width: 100vw;
     }
 
-    input {
-        background-color: inherit;
-        color: white;
+    .sensor-select {
+        --background-color: #282C31;
+        --border-radius: 10px;
+        --border-width: 2px;
+        background: var(--background-color);
+        display: flex;
+        flex-direction: column;
+        border-radius: var(--border-radius);
+
+        .tab {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+
+            div {
+                width: 50%;
+                padding: 5px;
+                text-align: center;
+                font-size: larger;
+                cursor: pointer;
+                border: var(--border-width) solid var(--background-color);
+                border-bottom: var(--border-width) solid var(--border-color);
+                border-top-left-radius: var(--border-radius);
+                border-top-right-radius: var(--border-radius);
+            } 
+
+            .selected {
+                border: var(--border-width) solid var(--border-color);
+                border-bottom: var(--border-width) solid var(--background-color);
+            }
+            
+        }
+
+        .tab-content {
+            flex-grow: 1;
+            padding: 12px;
+            border: var(--border-width) solid var(--border-color);
+            border-top: none;
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+        }
     }
+
+     
 </style>
 
 <div class="wrapper">
@@ -182,8 +231,20 @@ function resizeGraph() {
         <h1 style="color: #eaeaea;font-size: 1.8rem;">Die 🎈 Louise</h1>
     </nav>
 
-    <div class="content">
-        <SensorSwitch bind:sensor={sensor} on:change={changeSensor} />
+    <div class="content" style="--border-color: {currentTab == 0 ? sensorOneColor : sensorTwoColor}">
+        <div class="sensor-select">
+            <div class="tab">
+                <div class="{currentTab == 0 ? "selected" : "" }" on:click={() => {currentTab = 0}}>Graph 1</div>
+                <div class="{currentTab == 1 ? "selected" : ""}" on:click={() => {currentTab = 1}}>Graph 2</div>
+            </div>
+            <div class="tab-content"> 
+                {#if currentTab == 0}
+                    <SensorSwitch textColor="white" selectColor={sensorOneColor} id="0" bind:sensor={sensorOne} on:change={changeSensorOne} />
+                {:else}
+                    <SensorSwitch textColor="black" selectColor={sensorTwoColor}  id="1" bind:sensor={sensorTwo} on:change={changeSensorTwo} />
+                {/if}
+            </div>
+        </div>
         <div style="position: relative; width: 100%; height: 70vh; overflow: hidden;" bind:this={chart}></div>
     </div>
 </div>
