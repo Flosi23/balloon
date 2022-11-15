@@ -36,6 +36,9 @@ let option; // echarts options
 let sensorOne = 1; // selected sensor data
 let sensorTwo = 0;
 
+let change1 = 0;
+let change2 = 0;
+
 let times = [];
 
 let currentTab = 0;
@@ -97,6 +100,14 @@ onMount(() => {
     myChart = echarts.init(chart);
 
     option = {
+        toolbox: {
+            show: true,
+            feature: {
+                dataZoom: {
+                    yAxisIndex: 'none'
+                }
+            }
+        },
         xAxis: {
             type: 'category',
         },
@@ -134,6 +145,26 @@ onMount(() => {
     };
 
     option && myChart.setOption(option);
+
+     myChart.on("dataZoom", function(params) {
+         let firstEntry = logs[params.batch[0].startValue];
+         let lastEntry = logs[params.batch[0].endValue];
+         if (!lastEntry) {
+             change1 = 0;
+             change2 = 0;
+             return;
+         }
+         let seconds = (lastEntry[6] - firstEntry[6]);
+         console.log("seconds", seconds);
+         change1 = (lastEntry[sensorOne] - firstEntry[sensorOne]) / seconds * 60;
+
+         if (sensorTwo > 1) {
+             change2 = (lastEntry[sensorTwo] - firstEntry[sensorTwo]) / seconds * 60;
+         } else {
+             change2 = 0;
+         }
+
+     });
 
 })
 
@@ -244,6 +275,13 @@ const sensorTwoColor = "#a3be8c"
                     <SensorSwitch textColor="black" selectColor={sensorTwoColor}  id="1" bind:sensor={sensorTwo} on:change={changeSensorTwo} />
                 {/if}
             </div>
+
+            {#if change1 != 0}
+                <p style="text-align: center; font-size: 1.5rem;">Veränderung:&nbsp; <span style="color: #c2c3fb;">{change1.toFixed(4)} {sensorUnit[sensorOne]}/min</span></p>
+            {/if}
+            {#if change2 != 0}
+                <p style="text-align: center; font-size: 1.5rem;">Veränderung:&nbsp; <span style="color: rgb(169, 191, 150);">{change2.toFixed(4)} {sensorUnit[sensorTwo]}/min</span></p>
+            {/if}
         </div>
         <div style="position: relative; width: 100%; height: 70vh; overflow: hidden;" bind:this={chart}></div>
     </div>
