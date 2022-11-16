@@ -48,7 +48,7 @@
 	:global(*) {
 		transition-property: color, background-color, border-color;
 		transition-timing-function: ease;
-		transition-duration: .2s;
+		transition-duration: .05s;
 	}
 
 	:global(body) {
