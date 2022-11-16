@@ -10,7 +10,7 @@
  label {
     width: 250px;
     height: 45px;
-    color: #999;
+    color: var(--text-soft-color);
     border-radius: .5rem;
     display: flex;
     justify-content: center;
@@ -19,12 +19,11 @@
     cursor: pointer;
     font-family: arial, sans-serif;
     font-weight: 500;
-    background: #1A1C22;
-    transition: all ease .3s;
+    background: var(--btn-bg);
  }
 
  label:hover {
-     background: rgba(255,255,255,0.01);
+     background: var(--btn-bg-hover);
  }
 
  input:checked + label {

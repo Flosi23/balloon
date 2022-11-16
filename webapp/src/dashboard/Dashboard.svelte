@@ -184,27 +184,7 @@ const sensorTwoColor = "#a3be8c"
     <link href="https://fonts.googleapis.com/css2?family=Shadows+Into+Light&family=Teko&display=swap" rel="stylesheet">
 </svelte:head>
 
-<style lang="scss">
-    * {
-        color: white;
-    }
-    .wrapper {
-        padding: 0 20px;
-        font-family: 'Teko', sans-serif;
-    }
-    nav {
-        width: 100%;
-        height: auto;
-        display: flex;
-        justify-content: space-between;
-        padding: 0 20px;
-        box-sizing: border-box;
-        align-items: center;
-
-        p {
-            font-size: 1.2rem;
-        }
-    }
+<style lang="scss">  
     .content {
         display: flex;
         flex-wrap: nowrap;
@@ -212,7 +192,7 @@ const sensorTwoColor = "#a3be8c"
     }
 
     .sensor-select {
-        --background-color: #282C31;
+        --background-color: var(--panel-bg);
         --border-radius: 10px;
         --border-width: 2px;
         background: var(--background-color);
@@ -257,32 +237,26 @@ const sensorTwoColor = "#a3be8c"
      
 </style>
 
-<div class="wrapper">
-    <nav>
-        <h1 style="color: #eaeaea;font-size: 1.8rem;">Die 🎈 Louise</h1>
-    </nav>
-
-    <div class="content" style="--border-color: {currentTab == 0 ? sensorOneColor : sensorTwoColor}">
-        <div class="sensor-select">
-            <div class="tab">
-                <div class="{currentTab == 0 ? "selected" : "" }" on:click={() => {currentTab = 0}}>Graph 1</div>
-                <div class="{currentTab == 1 ? "selected" : ""}" on:click={() => {currentTab = 1}}>Graph 2</div>
-            </div>
-            <div class="tab-content"> 
-                {#if currentTab == 0}
-                    <SensorSwitch textColor="white" selectColor={sensorOneColor} id="0" bind:sensor={sensorOne} on:change={changeSensorOne} />
-                {:else}
-                    <SensorSwitch textColor="black" selectColor={sensorTwoColor}  id="1" bind:sensor={sensorTwo} on:change={changeSensorTwo} />
-                {/if}
-            </div>
-
-            {#if change1 != 0}
-                <p style="text-align: center; font-size: 1.5rem;">Veränderung:&nbsp; <span style="color: #c2c3fb;">{change1.toFixed(4)} {sensorUnit[sensorOne]}/min</span></p>
-            {/if}
-            {#if change2 != 0}
-                <p style="text-align: center; font-size: 1.5rem;">Veränderung:&nbsp; <span style="color: rgb(169, 191, 150);">{change2.toFixed(4)} {sensorUnit[sensorTwo]}/min</span></p>
+<div class="content" style="--border-color: {currentTab == 0 ? sensorOneColor : sensorTwoColor}">
+    <div class="sensor-select">
+        <div class="tab">
+            <div class="{currentTab == 0 ? "selected" : "" }" on:click={() => {currentTab = 0}}>Graph 1</div>
+            <div class="{currentTab == 1 ? "selected" : ""}" on:click={() => {currentTab = 1}}>Graph 2</div>
+        </div>
+        <div class="tab-content"> 
+            {#if currentTab == 0}
+                <SensorSwitch textColor="white" selectColor={sensorOneColor} id="0" bind:sensor={sensorOne} on:change={changeSensorOne} />
+            {:else}
+                <SensorSwitch textColor="black" selectColor={sensorTwoColor}  id="1" bind:sensor={sensorTwo} on:change={changeSensorTwo} />
             {/if}
         </div>
-        <div style="position: relative; width: 100%; height: 70vh; overflow: hidden;" bind:this={chart}></div>
+
+        {#if change1 != 0}
+            <p style="text-align: center; font-size: 1.5rem;">Veränderung:&nbsp; <span style="color: #c2c3fb;">{change1.toFixed(4)} {sensorUnit[sensorOne]}/min</span></p>
+        {/if}
+        {#if change2 != 0}
+            <p style="text-align: center; font-size: 1.5rem;">Veränderung:&nbsp; <span style="color: rgb(169, 191, 150);">{change2.toFixed(4)} {sensorUnit[sensorTwo]}/min</span></p>
+        {/if}
     </div>
+    <div style="position: relative; width: 100%; height: 70vh; overflow: hidden;" bind:this={chart}></div>
 </div>

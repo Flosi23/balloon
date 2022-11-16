@@ -1,7 +1,8 @@
 import datetime
 
 # Specifying the srcDir like this means that this script expects to be executed from ./balloon/shitToGold!
-srcDir ="./rawdata/" 
+srcDir ="./shitToGold/rawdata/" 
+outDir = "./webapp/public/"
 
 lines = []
 
@@ -134,7 +135,7 @@ cleanUpLines()
 extractFlightLines()
 flattenTempAndHumidityOutsideCurves()
 
-f = open("./data.csv", "w")
+f = open(outDir + "data.csv", "w")
 f.write("\n".join(lines))
 f.close()
 
