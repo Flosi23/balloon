@@ -6,7 +6,7 @@ import SensorSwitch from '../sensorswitch/SensorSwitch.svelte';
 
 export let logs = [];
 
-let sensorUnit = ["s", "hPA", "%", "°C", "%", "°C", "", "", "", "", "m"]
+let sensorUnit = ["s", "hPA", "%", "°C", "%", "°C", "", "", "", "", "m", "m"]
 let sensorName = [
     "Laufende Sekunde", 
     "Druck",
@@ -19,7 +19,8 @@ let sensorName = [
     "GPS-Satelliten",
     "GPS-Länge",
     "GPS-Breite",
-    "Höhe"
+    "GPS-Höhe",
+    "Berechnete Höhe"
 ]
 
 $: {

@@ -67,4 +67,7 @@ export let textColor = ""
 
     <input id="gps-height-{id}" type="radio" bind:group={sensor} name="sensor{id}" value="11" />
     <label for="gps-height-{id}">GPS-Höhe</label>
+
+    <input id="comp-height-{id}" type="radio" bind:group={sensor} name="sensor{id}" value="12" />
+    <label for="comp-height-{id}">Berechnete Höhe</label>
 </div>

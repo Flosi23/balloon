@@ -1,4 +1,6 @@
 import datetime
+import math
+import pvlib
 
 # Specifying the srcDir like this means that this script expects to be executed from ./balloon/shitToGold!
 srcDir ="./shitToGold/rawdata/" 
@@ -19,6 +21,7 @@ lines = []
 #   9  GPS-Length,
 #   10 GPS-Width,
 #   11 GPS-Height
+#   12 Computed Height
 
 def createUnixTimestamp(month, day, hour, minute, second):
     timestamp = 0
@@ -44,6 +47,9 @@ def parseRawDateAndTimeToUnixTimestamp(hms, md):
     second = int(hms[2])
     return createUnixTimestamp(month, day, hour, minute, second)
 
+def computeHeightFromPressure(pressureString):
+    pressure = float(pressureString) 
+    return pvlib.atmosphere.pres2alt(pressure * 100)
 
 def formatLine(line):
     # split the line in its columns
@@ -58,6 +64,8 @@ def formatLine(line):
     timestamp = parseRawDateAndTimeToUnixTimestamp(fields[6].split(":"), fields[7].split("/"))
     fields[6] = str(timestamp)
     del fields[7]
+
+    fields.append(str(computeHeightFromPressure(fields[1])))
 
     # reassemble the fields into one line
     return ",".join(fields)
