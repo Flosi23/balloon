@@ -49,7 +49,8 @@ def parseRawDateAndTimeToUnixTimestamp(hms, md):
 
 def computeHeightFromPressure(pressureString):
     pressure = float(pressureString) 
-    return pvlib.atmosphere.pres2alt(pressure * 100)
+    altitude = pvlib.atmosphere.pres2alt(pressure * 100)
+    return round(altitude, 2)
 
 def formatLine(line):
     # split the line in its columns

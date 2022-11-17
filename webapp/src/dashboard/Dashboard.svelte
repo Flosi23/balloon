@@ -2,11 +2,13 @@
 
 import * as echarts from 'echarts';
 import { onMount } from 'svelte';
+  import { prevent_default } from 'svelte/internal';
+  import App from '../App.svelte';
 import SensorSwitch from '../sensorswitch/SensorSwitch.svelte';
 
 export let logs = [];
 
-let sensorUnit = ["s", "hPA", "%", "°C", "%", "°C", "", "", "", "", "m", "m"]
+let sensorUnit = ["s", "hPA", "%", "°C", "%", "°C", "", "", "", "", "", "m", "m"]
 let sensorName = [
     "Laufende Sekunde", 
     "Druck",
@@ -65,6 +67,7 @@ function generateChartData() {
         9  GPS-Length,
         10 GPS-Width,
         11 GPS-Height
+        12 Computed Height
     If a value was not recorded, the fields value will instead be "--.---"
     */
     times = logs.map(row => formatDate(new Date(row[6] * 1000)))
@@ -82,6 +85,13 @@ function changeSensorTwo(){
 
 function changeSensor(yAxisIndex, sensor) {
     if (option && myChart) {
+        option.yAxis[0].max = null;
+        option.yAxis[1].max = null;
+        option.yAxis[0].min = null;
+        option.yAxis[1].min = null;
+        option.yAxis[0].alignTicks = true;
+        option.yAxis[1].alignTicks = true;
+
         option.xAxis.data = times;
         option.yAxis[yAxisIndex].name = sensorUnit[sensor];
 
@@ -90,8 +100,27 @@ function changeSensor(yAxisIndex, sensor) {
             data.push(row[sensor]);
         }
 
+        if(sensorUnit[sensorOne] === sensorUnit[sensorTwo]){
+            console.log("Units are the same")
+            const dataSensorOne = logs.map((row) => row[sensorOne])
+            const dataSensorTwo = logs.map((row) => row[sensorTwo])
+            const dataCombined = dataSensorOne.concat(dataSensorTwo)
+            const max = Math.max(...dataCombined)
+            let min = Math.min(...dataCombined)
+            min = min > 0 ? 0 : min; 
+            console.log("max", max)
+            option.yAxis[0].max = max;
+            option.yAxis[1].max = max;
+            option.yAxis[0].min = min;           
+            option.yAxis[1].min = min;
+            option.yAxis[0].alignTicks = false;
+            option.yAxis[1].alignTicks = false;
+        }
+
         option.series[yAxisIndex].data = data;
         option.series[yAxisIndex].name = sensorName[sensor]
+
+        console.log("option", option)
 
         myChart.setOption(option);
     }
@@ -115,11 +144,11 @@ onMount(() => {
         yAxis: [
             {
                 type: 'value',
-                alignTicks: true,
+                // alignTicks: true,
             },
             {
                 type: 'value',
-                alignTicks: true,
+                // alignTicks: true,
             }
         ],
         tooltip: {
