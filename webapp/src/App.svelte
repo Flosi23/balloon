@@ -9,7 +9,7 @@
 	let darkMode = true;
 
 	async function fetchCSV() {
-		const res = await fetch("/data.csv")
+		const res = await fetch("./data.csv")
 		const csv = await res.text()	
 
 		let rows = csv.split(/\r\n|\n/)
