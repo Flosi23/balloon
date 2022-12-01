@@ -2,8 +2,6 @@
 
 import * as echarts from 'echarts';
 import { onMount } from 'svelte';
-  import { prevent_default } from 'svelte/internal';
-  import App from '../App.svelte';
 import SensorSwitch from '../sensorswitch/SensorSwitch.svelte';
 
 export let logs = [];
@@ -104,7 +102,7 @@ function changeSensor(yAxisIndex, sensor) {
             console.log("Units are the same")
             const dataSensorOne = logs.map((row) => row[sensorOne])
             const dataSensorTwo = logs.map((row) => row[sensorTwo])
-            const dataCombined = dataSensorOne.concat(dataSensorTwo)
+            const dataCombined = dataSensorOne.concat(dataSensorTwo).filter(val => !isNaN(val));
             const max = Math.max(...dataCombined)
             let min = Math.min(...dataCombined)
             min = min > 0 ? 0 : min; 
